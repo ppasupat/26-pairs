@@ -1,0 +1,84 @@
+/* ################################ */
+/* reset */
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  background-color: black;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game {
+  position: relative;
+  background-color: white;
+  width: 800px;
+  height: 500px;
+}
+
+#scene-preload, #scene-main {
+  position: absolute;
+  width: 800px;
+  height: 500px;
+  left: 0; top: 0;
+}
+
+/* ################################ */
+/* preload scene */
+
+#scene-preload {
+}
+
+#pane-title {
+  position: absolute;
+  left: 0; top: 120px;
+  width: 800px; height: 120px;
+  font-size: 60px;
+  text-align: center;
+}
+
+#pane-loading {
+  position: absolute;
+  left: 0; top: 280px;
+  width: 800px; height: 120px;
+  font-size: 30px;
+  text-align: center;
+}
+
+#pane-loading button {
+  font-size: 30px;
+  padding: 10px 20px;
+}
+
+/* ################################ */
+/* main scene */
+
+#scene-main {
+  display: none;
+}
+
+#pane-main {
+  position: absolute;
+  left: 0; top: 0;
+  width: 800px; height: 380px;
+  background: white;
+}
+
+#pane-bag {
+  position: absolute;
+  left: 0; top: 380px;
+  width: 800px; height: 120px;
+  background: #EEE;
+}
