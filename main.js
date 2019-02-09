@@ -1,15 +1,24 @@
 $(function () {
 
   const DEBUG = true;
+  var currentLevel = 0;
 
   // ################################
   // 
 
   function showMainScene() {
     $('#scene-main').show();
-    $('#scene-preload').hide();
+    $('#pane-info, #info-inst').show();
 
+    // Done!
+    $('#scene-preload').hide();
+    currentLevel = 1;
   }
+
+  $('#pane-info button').click(function () {
+
+    $('#pane-info').hide();
+  });
 
   // ################################
   // READY!!
