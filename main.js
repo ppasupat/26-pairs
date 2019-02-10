@@ -31,11 +31,16 @@ $(function () {
       bg: "Z",
     },
   ];
+  const BAG_ITEMS = ["A", "B", "D", "H", "I", "L", "O", "P", "R", "T", "Y"];
   const CARD_WIDTH = 60,
     CARD_HEIGHT = 80,
     TIMEOUT = 1000;
-  let currentLevel = 0,
-    pairsLeft = 0,
+  let currentLevel = 0;
+
+  // ################################
+  // Part 1: Matching game
+
+  let pairsLeft = 0,
     oddsLeft = 0,
     livesLeft = 0,
     open1 = null,
@@ -47,9 +52,6 @@ $(function () {
     let offset = (65 - name.charCodeAt(0)) * CARD_WIDTH;
     card.css('background-position-x', '' + offset + 'px');
   }
-
-  // ################################
-  // 
 
   $('#pane-info button').click(function () {
     genCards();
@@ -174,6 +176,26 @@ $(function () {
   }
 
   // ################################
+  // Part 2: Inventory
+
+  function initBag() {
+    BAG_ITEMS.forEach(function (name) {
+      let bagGroup = $('<div class="bag-group bag-group-0">')
+        .appendTo('#pane-bag').data('name', name)
+      let card1 = $('<div class="card bag-card-1">')
+        .data('name', name).appendTo(bagGroup);
+      toggleCard(card1, true);
+      let card2 = $('<div class="card bag-card-2">')
+        .data('name', name).appendTo(bagGroup);
+      toggleCard(card2, true);
+    });
+  }
+
+  function toggleBagItem(name, amount) {
+    
+  };
+
+  // ################################
   // READY!!
 
   function preload() {
@@ -184,6 +206,7 @@ $(function () {
         $('#scene-main').show();
         $('#pane-info, #info-inst').show();
         $('#scene-preload').hide();
+        initBag();
       }));
   }
 

@@ -155,3 +155,29 @@ body {
   font-size: 36px;
   font-weight: bold;
 }
+
+/* ################################ */
+/* bag */
+
+#pane-bag {
+  display: flex;
+  padding: 10px 10px;
+}
+
+.bag-group {
+  margin: 5px;
+}
+
+.bag-group .card {
+  position: relative;
+  margin: 0;
+}
+
+.bag-card-2 {
+  top: -70px;
+  left: 5px;
+}
+
+.bag-group-0 .bag-card-1, .bag-group-0 .bag-card-2 {
+  display: none;
+}
