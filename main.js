@@ -1,7 +1,7 @@
 $(function () {
   "use strict";
 
-  const DEBUG = true, DEBUG_FINAL = true;
+  const DEBUG = true, DEBUG_FINAL = false;
   const LEVEL_DATA = [
     {
       name: 1,
@@ -17,7 +17,7 @@ $(function () {
         "S", "S", "X", "X", "X", "X", "X",
       ],
       layout: [5, 5, 5],
-      lives: 8,
+      lives: 7,
       bg: "M",
     },
     {
@@ -27,7 +27,7 @@ $(function () {
         "C", "C", "W", "W", "X", "X", "X", "X", "X", "X", "X",
       ],
       layout: [7, 7, 7],
-      lives: 12,
+      lives: 10,
       bg: "Z",
     },
   ];
@@ -123,6 +123,10 @@ $(function () {
   $('#pane-area').on("click", ".card", function (e) {
     if (livesLeft <= 0) return;
     let thisCard = $(this);
+    // Speed mode: interrupt the timeout
+    if (open1 !== null && open2 !== null) {
+      if (validatePair()) return;
+    }
     // Don't open removed card
     if (thisCard.hasClass('removed')) return;
     // Don't open the same card
@@ -130,15 +134,12 @@ $(function () {
         open1.data('index') == thisCard.data('index')) {
       return;
     }
-    // Speed mode: interrupt the timeout
-    if (open1 !== null && open2 !== null) {
-      if (validatePair()) return;
-    }
     toggleCard(thisCard, true);
     // If it's X, reduce life and maybe show the game over screen
     if (thisCard.data('name') == 'X') {
       livesLeft--;
       updateHud();
+      flashHud('#hud-lives');
       if (livesLeft === 0) {
         showLose();
         return;
@@ -159,8 +160,10 @@ $(function () {
       open2.addClass('removed');
       if (open1.data('name') == 'X') {
         oddsLeft -= 2;
+        flashHud('#hud-odds');
       } else {
         pairsLeft -= 1;
+        flashHud('#hud-pairs');
         incrBagItem(open1.data('name'), +2);
       }
       updateHud();
@@ -282,6 +285,34 @@ $(function () {
       }
     }
   });
+
+  // ################################
+  // Special effects
+
+  const FLASH_TIMEOUT = 400;
+  const FLASH_COLOR = {
+    '#hud-pairs': {'fg': '#0A0', 'bg': '#EFE'},
+    '#hud-odds': {'fg': '#A52', 'bg': '#FED'},
+    '#hud-lives': {'fg': 'red', 'bg': '#FAA'},
+  }
+
+  function flashHud(hudName) {
+    let div = $(hudName);
+    if (div.data('flash')) clearTimeout(+div.data('flash'));
+    let style = {
+      'color': FLASH_COLOR[hudName].fg,
+      'background-color': FLASH_COLOR[hudName].bg,
+      'box-shadow': '0 0 15px 15px ' + FLASH_COLOR[hudName].bg,
+    };
+    div.css(style);
+    div.data('flash', setTimeout(function () {
+      div.css({
+        'color': '',
+        'background-color': '',
+        'box-shadow': '',
+      });
+    }, FLASH_TIMEOUT));
+  };
 
   // ################################
   // READY!!
