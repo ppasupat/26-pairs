@@ -86,14 +86,12 @@ body {
   position: absolute;
   left: 720px; top: 20px;
   width: 60px; height: 340px;
-  background: #EEE;
 }
 
 #pane-area {
   position: absolute;
   left: 20px; top: 20px;
   width: 680px; height: 340px;
-  background: #EEE;
 }
 
 #pane-bag {
@@ -121,4 +119,39 @@ body {
 #info-button-line button {
   font-size: 28px;
   padding: 10px 20px;
+}
+
+/* ################################ */
+/* cards */
+
+.card-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.card {
+  border: 1px solid #200;
+  border-radius: 5px;
+  width: 60px;
+  height: 80px;
+  margin: 10px;
+  background-image: url('img/cards.png');
+}
+
+.card.removed {
+  background-image: none;
+  border: 1px solid #AAA;
+}
+
+/* ################################ */
+/* hud */
+
+#pane-hud div {
+  text-align: center;
+  margin: 5px 0;
+}
+
+#hud-pairs, #hud-odds, #hud-lives {
+  font-size: 36px;
+  font-weight: bold;
 }
