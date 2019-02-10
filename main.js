@@ -1,7 +1,7 @@
 $(function () {
   "use strict";
 
-  const DEBUG = true;
+  const DEBUG = true, DEBUG_FINAL = true;
   const LEVEL_DATA = [
     {
       name: 1,
@@ -32,10 +32,18 @@ $(function () {
     },
   ];
   const BAG_ITEMS = ["A", "B", "D", "H", "I", "L", "O", "P", "R", "T", "Y"];
+  const FINAL_ANSWER = [
+    ["H", "A", "P", "P", "Y"],
+    ["B", "I", "R", "T", "H", "D", "A", "Y"],
+    ["T", "O", " ", "O", "I", "L"],
+  ];
+  const EXTRA_ANSWER = ["B", "L", "R", "D"];
   const CARD_WIDTH = 60,
     CARD_HEIGHT = 80,
-    TIMEOUT = 1000;
+    TIMEOUT = 1000,
+    EXTRA_TIMEOUT = DEBUG_FINAL ? 1000 : 5000;
   let currentLevel = 0;
+  if (DEBUG_FINAL) currentLevel = 3;
 
   // ################################
   // Part 1: Matching game
@@ -48,15 +56,24 @@ $(function () {
     cardCloseTimeout = null;
 
   function toggleCard(card, flag) {
-    let name = flag ? card.data('name') : LEVEL_DATA[currentLevel].bg;
+    let name = card.data('name');
+    if (flag === false) {
+      name = LEVEL_DATA[currentLevel].bg;
+    } else if (flag !== true) {
+      name = flag;
+    }
     let offset = (65 - name.charCodeAt(0)) * CARD_WIDTH;
     card.css('background-position-x', '' + offset + 'px');
   }
 
   $('#pane-info button').click(function () {
-    genCards();
-    livesLeft = LEVEL_DATA[currentLevel].lives;
-    updateHud();
+    if (currentLevel < LEVEL_DATA.length) {
+      genCards();
+      livesLeft = LEVEL_DATA[currentLevel].lives;
+      updateHud();
+    } else {
+      genFinal();
+    }
     $('#pane-info').hide();
   });
 
@@ -73,6 +90,7 @@ $(function () {
     }
     // Put on board
     pairsLeft = 0;
+    oddsLeft = 0;
     $('#pane-area').empty();
     let rowId = 0, rowLimit = 0, rowDiv;
     for (let k = 0; k < cards.length; k++) {
@@ -82,12 +100,16 @@ $(function () {
       }
       let cardDiv = $('<div class=card>').appendTo(rowDiv)
         .data({index: k, name: cards[k]});
+      if (DEBUG) cardDiv.text(cards[k]);
       toggleCard(cardDiv, false);
+      // Update the count
       if (cards[k] != 'X') {
         pairsLeft += 0.5;
       } else {
         oddsLeft += 1;
       }
+      // Remove from bag
+      incrBagItem(cards[k], -1);
     }
     open1 = open2 = cardCloseTimeout = null;
   };
@@ -139,6 +161,7 @@ $(function () {
         oddsLeft -= 2;
       } else {
         pairsLeft -= 1;
+        incrBagItem(open1.data('name'), +2);
       }
       updateHud();
       if (pairsLeft === 0) {
@@ -178,9 +201,11 @@ $(function () {
   // ################################
   // Part 2: Inventory
 
+  var bagGroups = {}, bagAmounts = {}, slotDivs = [], currentSlotMark = 0;
+
   function initBag() {
     BAG_ITEMS.forEach(function (name) {
-      let bagGroup = $('<div class="bag-group bag-group-0">')
+      let bagGroup = $('<div class=bag-group>')
         .appendTo('#pane-bag').data('name', name)
       let card1 = $('<div class="card bag-card-1">')
         .data('name', name).appendTo(bagGroup);
@@ -188,12 +213,75 @@ $(function () {
       let card2 = $('<div class="card bag-card-2">')
         .data('name', name).appendTo(bagGroup);
       toggleCard(card2, true);
+      bagGroups[name] = bagGroup;
+      bagAmounts[name] = 0;
+      if (DEBUG_FINAL) incrBagItem(name, +2);
     });
   }
 
-  function toggleBagItem(name, amount) {
-    
+  function incrBagItem(name, incr) {
+    if (bagGroups[name] === undefined) return; 
+    bagAmounts[name] = Math.min(2, Math.max(0, bagAmounts[name] + incr));
+    bagGroups[name].find('.bag-card-1').toggle(bagAmounts[name] >= 1);
+    bagGroups[name].find('.bag-card-2').toggle(bagAmounts[name] >= 2);
   };
+
+  function genFinal() {
+    $('#pane-hud, #pane-area').empty();
+    $('#pane-final').show();
+    FINAL_ANSWER.forEach(function (row) {
+      let rowDiv = $('<div class=card-row>').appendTo('#pane-final');
+      row.forEach(function (name) {
+        let slotDiv = $('<div class=card-slot>')
+          .appendTo(rowDiv).data({name: name});
+        if (name == ' ') {
+          slotDiv.addClass('empty');
+        } else {
+          toggleCard(slotDiv, 'J');
+          slotDivs.push(slotDiv);
+        }
+      });
+    });
+    toggleCard(slotDivs[0], 'K');
+  }
+
+  function genExtra() {
+    $('#pane-extra').show();
+    slotDivs = [];
+    currentSlotMark = 0;
+    let rowDiv = $('<div class=card-row>').appendTo('#pane-extra');
+    rowDiv.append($('<span>ขอให้ไม่</span>'));
+    EXTRA_ANSWER.forEach(function (name) {
+      let slotDiv = $('<div class=card-slot>')
+        .appendTo(rowDiv).data({name: name});
+      toggleCard(slotDiv, 'J');
+      slotDivs.push(slotDiv);
+    });
+    toggleCard(slotDivs[0], 'K');
+  }
+
+  $('#pane-bag').on('click', '.card', function () {
+    if (currentLevel < LEVEL_DATA.length ||
+        currentSlotMark >= slotDivs.length) return;
+    let thisCard = $(this), name = thisCard.data('name');
+    if (name == slotDivs[currentSlotMark].data('name')) {
+      incrBagItem(name, -1);
+      toggleCard(slotDivs[currentSlotMark], true);
+      currentSlotMark++;
+      if (currentSlotMark !== slotDivs.length) {
+        toggleCard(slotDivs[currentSlotMark], 'K');
+      } else {
+        // TODO: Show some animation or something
+        alert('DONE');
+        if (currentLevel == LEVEL_DATA.length) {
+          setTimeout(function () {
+            currentLevel++;
+            genExtra();
+          }, EXTRA_TIMEOUT);
+        }
+      }
+    }
+  });
 
   // ################################
   // READY!!

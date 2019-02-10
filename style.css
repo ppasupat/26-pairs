@@ -101,6 +101,19 @@ body {
   background: #EEE;
 }
 
+#pane-final {
+  position: absolute;
+  left: 20px; top: 20px;
+  display: none;
+}
+
+#pane-extra {
+  position: absolute;
+  right: 20px; top: 280px;
+  display: none;
+  font-size: 32px;
+}
+
 #pane-info {
   position: absolute;
   left: 20px; top: 20px;
@@ -127,20 +140,30 @@ body {
 .card-row {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
-.card {
+.card, .card-slot {
   border: 1px solid #200;
   border-radius: 5px;
   width: 60px;
   height: 80px;
   margin: 10px;
   background-image: url('img/cards.png');
+  font-size: 40px;   /* for debug only */
 }
 
 .card.removed {
   background-image: none;
   border: 1px solid #AAA;
+}
+
+.card-slot {
+  margin: 5px;
+}
+.card-slot.empty {
+  border: none;
+  background: none;
 }
 
 /* ################################ */
@@ -166,18 +189,16 @@ body {
 
 .bag-group {
   margin: 5px;
+  width: 60px;
 }
 
 .bag-group .card {
   position: relative;
   margin: 0;
+  display: none;
 }
 
 .bag-card-2 {
   top: -70px;
   left: 5px;
-}
-
-.bag-group-0 .bag-card-1, .bag-group-0 .bag-card-2 {
-  display: none;
 }
