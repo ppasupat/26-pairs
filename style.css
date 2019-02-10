@@ -177,12 +177,13 @@ button {
 
 #pane-hud div {
   text-align: center;
-  margin: 5px 0;
+  margin: 10px 0;
 }
 
-#hud-pairs, #hud-odds, #hud-lives {
+#hud-pairs, #hud-lives {
   font-size: 42px;
   font-weight: bold;
+  border-radius: 25px;
 }
 
 /* ################################ */

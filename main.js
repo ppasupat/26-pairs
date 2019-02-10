@@ -51,7 +51,6 @@ $(function () {
   // Part 1: Matching game
 
   let pairsLeft = 0,
-    oddsLeft = 0,
     livesLeft = 0,
     open1 = null,
     open2 = null;
@@ -91,7 +90,6 @@ $(function () {
     }
     // Put on board
     pairsLeft = 0;
-    oddsLeft = 0;
     $('#pane-area').empty();
     let rowId = 0, rowLimit = 0, rowDiv;
     for (let k = 0; k < cards.length; k++) {
@@ -106,9 +104,7 @@ $(function () {
       // Update the count
       if (cards[k] != 'X') {
         pairsLeft += 0.5;
-      } else {
-        oddsLeft += 1;
-      }
+      } 
       // Remove from bag
       incrBagItem(cards[k], -1);
     }
@@ -117,7 +113,6 @@ $(function () {
 
   function updateHud() {
     $('#hud-pairs').text(pairsLeft);
-    $('#hud-odds').text(oddsLeft);
     $('#hud-lives').text(livesLeft);
   }
 
@@ -159,10 +154,7 @@ $(function () {
     if (open1.data('name') == open2.data('name')) {
       open1.addClass('removed');
       open2.addClass('removed');
-      if (open1.data('name') == 'X') {
-        oddsLeft -= 2;
-        flashHud('#hud-odds');
-      } else {
+      if (open1.data('name') != 'X') {
         pairsLeft -= 1;
         flashHud('#hud-pairs');
         incrBagItem(open1.data('name'), +2);
@@ -302,8 +294,7 @@ $(function () {
 
   const FLASH_TIMEOUT = 400;
   const FLASH_COLOR = {
-    '#hud-pairs': {'fg': '#0A0', 'bg': '#DFD'},
-    '#hud-odds': {'fg': '#A52', 'bg': '#FED'},
+    '#hud-pairs': {'fg': '#0B0', 'bg': '#BFB'},
     '#hud-lives': {'fg': 'red', 'bg': '#FAA'},
   }
 
