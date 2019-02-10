@@ -42,6 +42,7 @@ $(function () {
   const SCREEN_WIDTH = 800, SCREEN_HEIGHT = 500;
   const TIMEOUT = 1000,
     INFO_FADE = 300,
+    ITEM_FADE = 300,
     SLOT_FADE = 2000,
     EXTRA_TIMEOUT = DEBUG_FINAL ? 1000 : 3000;
   let currentLevel = 0;
@@ -188,6 +189,7 @@ $(function () {
   }
 
   function showLose() {
+    confetti(poopConfetti);
     $('.card').each(function (i, card) {
       card = $(card);
       if (!card.hasClass('removed') && card.data('name') == 'X') {
@@ -204,6 +206,12 @@ $(function () {
   // ################################
   // Part 2: Inventory
 
+  const bgItems = {
+    'C': 'item-cake',
+    'F': 'item-flag',
+    'S': 'item-balloons',
+    'W': 'item-present',
+  };
   let bagGroups = {}, bagAmounts = {};
   let slotReady = false, slotDivs = [], currentSlotMark = 0;
 
@@ -224,6 +232,15 @@ $(function () {
   }
 
   function incrBagItem(name, incr) {
+    if (bgItems[name] !== undefined) {
+      let item = $('#' + bgItems[name]);
+      if (incr > 0) {
+        item.fadeIn(ITEM_FADE);
+      } else {
+        item.hide();
+      }
+      return;
+    }
     if (bagGroups[name] === undefined) return; 
     bagAmounts[name] = Math.min(2, Math.max(0, bagAmounts[name] + incr));
     bagGroups[name].find('.bag-card-1').toggle(bagAmounts[name] >= 1);
@@ -278,7 +295,7 @@ $(function () {
       if (currentSlotMark !== slotDivs.length) {
         toggleCard(slotDivs[currentSlotMark], 'K');
       } else {
-        confetti(normalConfetti);
+        confetti(currentLevel == LEVEL_DATA.length ? normalConfetti : birdConfetti);
         if (currentLevel == LEVEL_DATA.length) {
           setTimeout(function () {
             currentLevel++;
@@ -295,7 +312,7 @@ $(function () {
   const FLASH_TIMEOUT = 400;
   const FLASH_COLOR = {
     '#hud-pairs': {'fg': '#0B0', 'bg': '#BFB'},
-    '#hud-lives': {'fg': 'red', 'bg': '#FAA'},
+    '#hud-lives': {'fg': '#B00', 'bg': '#F88'},
   }
 
   function flashHud(hudName) {
@@ -324,19 +341,17 @@ $(function () {
   function confetti(objFn) {
     for (let i = 0; i < NUM_CONFETTI; i++) {
       setTimeout(function () {
-        let leftBefore = Math.random() * SCREEN_WIDTH;
+        let leftBefore = Math.random() * (SCREEN_WIDTH - 75) + 25;
         let leftAfter = leftBefore + Math.random() * 400 - 200;
-        leftAfter = Math.min(SCREEN_WIDTH, Math.max(0, leftAfter));
+        leftAfter = Math.min(SCREEN_WIDTH - 50, Math.max(25, leftAfter));
         let topAfter = (Math.random() * 0.3 + 0.7) * SCREEN_HEIGHT;
-        let rotateBefore = Math.random() * 360;
-        let rotateAfter = rotateBefore
+        let rotateAfter = Math.random() * 360;
         let confetti = objFn()
           .appendTo('#scene-main')
           .css({
             'top': '0',
             'left': leftBefore + 'px',
             'opacity': 0.9,
-            'transform': "rotate("+ rotateBefore + "deg)",
           }).animate({
             'top': topAfter + 'px',
             'left': leftAfter + 'px',
@@ -366,6 +381,24 @@ $(function () {
       'width': width + 'px',
       'height': height + 'px',
       'background-color': bg,
+    });
+  }
+
+  function poopConfetti() {
+    let size = Math.random() * 32 + 10;
+    return $('<div class="confetti confetti-poop">').css({
+      'width': size + 'px',
+      'height': size + 'px',
+      'background-size': size + 'px',
+    });
+  }
+
+  function birdConfetti() {
+    let size = Math.random() * 32 + 10;
+    return $('<div class="confetti confetti-bird">').css({
+      'width': size + 'px',
+      'height': size + 'px',
+      'background-size': size + 'px',
     });
   }
 

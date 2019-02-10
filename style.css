@@ -69,7 +69,7 @@ button {
   position: absolute;
   left: 0; top: 0;
   width: 800px; height: 380px;
-  background: white;
+  background: url('img/bg.png');
 }
 
 #pane-hud {
@@ -102,6 +102,38 @@ button {
   right: 20px; top: 280px;
   display: none;
   font-size: 32px;
+}
+
+#item-flag {
+  position: absolute;
+  right: 0; top: 0;
+  width: 669px; height: 128px;
+  background: url('img/flags.png');
+  display: none;
+}
+
+#item-balloons {
+  position: absolute;
+  right: 0; top: 8px;
+  width: 265px; height: 323px;
+  background: url('img/balloons.png');
+  display: none;
+}
+
+#item-present {
+  position: absolute;
+  right: 105px; top: 285px;
+  width: 121px; height: 99px;
+  background: url('img/present.png');
+  display: none;
+}
+
+#item-cake {
+  position: absolute;
+  left: 251px; top: 213px;
+  width: 301px; height: 130px;
+  background: url('img/cake.png');
+  display: none;
 }
 
 /* ################################ */
@@ -217,3 +249,10 @@ button {
   position: absolute;
 }
 
+.confetti-poop {
+  background: url('img/poop.png');
+}
+
+.confetti-bird {
+  background: url('img/bird.png');
+}
