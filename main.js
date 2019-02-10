@@ -38,10 +38,12 @@ $(function () {
     ["T", "O", " ", "O", "I", "L"],
   ];
   const EXTRA_ANSWER = ["B", "L", "R", "D"];
-  const CARD_WIDTH = 60,
-    CARD_HEIGHT = 80,
-    TIMEOUT = 1000,
-    EXTRA_TIMEOUT = DEBUG_FINAL ? 1000 : 5000;
+  const CARD_WIDTH = 60, CARD_HEIGHT = 80;
+  const SCREEN_WIDTH = 800, SCREEN_HEIGHT = 500;
+  const TIMEOUT = 1000,
+    INFO_FADE = 300,
+    SLOT_FADE = 2000,
+    EXTRA_TIMEOUT = DEBUG_FINAL ? 1000 : 3000;
   let currentLevel = 0;
   if (DEBUG_FINAL) currentLevel = 3;
 
@@ -52,8 +54,7 @@ $(function () {
     oddsLeft = 0,
     livesLeft = 0,
     open1 = null,
-    open2 = null,
-    cardCloseTimeout = null;
+    open2 = null;
 
   function toggleCard(card, flag) {
     let name = card.data('name');
@@ -74,7 +75,7 @@ $(function () {
     } else {
       genFinal();
     }
-    $('#pane-info').hide();
+    $('#pane-info').fadeOut(INFO_FADE);
   });
 
   function genCards() {
@@ -111,7 +112,7 @@ $(function () {
       // Remove from bag
       incrBagItem(cards[k], -1);
     }
-    open1 = open2 = cardCloseTimeout = null;
+    open1 = open2 = null;
   };
 
   function updateHud() {
@@ -121,11 +122,11 @@ $(function () {
   }
 
   $('#pane-area').on("click", ".card", function (e) {
-    if (livesLeft <= 0) return;
+    if (livesLeft <= 0 || pairsLeft <= 0) return;
     let thisCard = $(this);
     // Speed mode: interrupt the timeout
     if (open1 !== null && open2 !== null) {
-      if (validatePair()) return;
+      validatePairAfter();
     }
     // Don't open removed card
     if (thisCard.hasClass('removed')) return;
@@ -150,7 +151,7 @@ $(function () {
       open1 = thisCard;
     } else {
       open2 = thisCard;
-      cardCloseTimeout = setTimeout(validatePair, TIMEOUT);
+      validatePair();
     }
   });
 
@@ -172,20 +173,26 @@ $(function () {
         return true;
       }
     }
-    toggleCard(open1, false);
-    toggleCard(open2, false);
+  }
+
+  function validatePairAfter() {
+    if (open1.data('name') == open2.data('name')) {
+    } else {
+      toggleCard(open1, false);
+      toggleCard(open2, false);
+    }
     open1 = null;
     open2 = null;
-    if (cardCloseTimeout !== null) {
-      clearTimeout(cardCloseTimeout);
-      cardCloseTimeout = null;
-    }
   }
 
   function showWin() {
-    $('.info').hide();
-    $('#pane-info, #info-win').show();
-    currentLevel++;
+    confetti();
+    setTimeout(function () {
+      $('.info').hide();
+      $('#info-win').show();
+      $('#pane-info').fadeIn(INFO_FADE);
+      currentLevel++;
+    }, TIMEOUT);
   }
 
   function showLose() {
@@ -197,14 +204,16 @@ $(function () {
     });
     setTimeout(function () {
       $('.info').hide();
-      $('#pane-info, #info-lose').show();
+      $('#info-lose').show();
+      $('#pane-info').fadeIn(INFO_FADE);
     }, TIMEOUT);
   }
 
   // ################################
   // Part 2: Inventory
 
-  var bagGroups = {}, bagAmounts = {}, slotDivs = [], currentSlotMark = 0;
+  let bagGroups = {}, bagAmounts = {};
+  let slotReady = false, slotDivs = [], currentSlotMark = 0;
 
   function initBag() {
     BAG_ITEMS.forEach(function (name) {
@@ -231,7 +240,6 @@ $(function () {
 
   function genFinal() {
     $('#pane-hud, #pane-area').empty();
-    $('#pane-final').show();
     FINAL_ANSWER.forEach(function (row) {
       let rowDiv = $('<div class=card-row>').appendTo('#pane-final');
       row.forEach(function (name) {
@@ -246,10 +254,11 @@ $(function () {
       });
     });
     toggleCard(slotDivs[0], 'K');
+    slotReady = false;
+    $('#pane-final').fadeIn(SLOT_FADE, function () {slotReady = true;});
   }
 
   function genExtra() {
-    $('#pane-extra').show();
     slotDivs = [];
     currentSlotMark = 0;
     let rowDiv = $('<div class=card-row>').appendTo('#pane-extra');
@@ -261,11 +270,14 @@ $(function () {
       slotDivs.push(slotDiv);
     });
     toggleCard(slotDivs[0], 'K');
+    slotReady = false;
+    $('#pane-extra').fadeIn(SLOT_FADE, function () {slotReady = true;});
   }
 
   $('#pane-bag').on('click', '.card', function () {
     if (currentLevel < LEVEL_DATA.length ||
-        currentSlotMark >= slotDivs.length) return;
+        currentSlotMark >= slotDivs.length ||
+        !slotReady) return;
     let thisCard = $(this), name = thisCard.data('name');
     if (name == slotDivs[currentSlotMark].data('name')) {
       incrBagItem(name, -1);
@@ -274,8 +286,7 @@ $(function () {
       if (currentSlotMark !== slotDivs.length) {
         toggleCard(slotDivs[currentSlotMark], 'K');
       } else {
-        // TODO: Show some animation or something
-        alert('DONE');
+        confetti();
         if (currentLevel == LEVEL_DATA.length) {
           setTimeout(function () {
             currentLevel++;
@@ -291,7 +302,7 @@ $(function () {
 
   const FLASH_TIMEOUT = 400;
   const FLASH_COLOR = {
-    '#hud-pairs': {'fg': '#0A0', 'bg': '#EFE'},
+    '#hud-pairs': {'fg': '#0A0', 'bg': '#DFD'},
     '#hud-odds': {'fg': '#A52', 'bg': '#FED'},
     '#hud-lives': {'fg': 'red', 'bg': '#FAA'},
   }
@@ -313,6 +324,44 @@ $(function () {
       });
     }, FLASH_TIMEOUT));
   };
+
+  // Stole the idea from Chuck Grimmett's post here:
+  // http://www.cagrimmett.com/til/2018/01/05/css-confetti.html
+
+  const NUM_CONFETTI = 80;
+  const CONFETTI_COLORS = ['red', 'green', 'yellow', 'blue'];
+
+  function confetti() {
+    for (let i = 0; i < NUM_CONFETTI; i++) {
+      setTimeout(function () {
+        let width = Math.random() * 7 + 1;
+        let height = width * 1.6;
+        let leftBefore = Math.random() * SCREEN_WIDTH;
+        let leftAfter = leftBefore + Math.random() * 100 - 50;
+        leftAfter = Math.min(SCREEN_WIDTH, Math.max(0, leftAfter));
+        let topAfter = (Math.random() * 0.3 + 0.7) * SCREEN_HEIGHT;
+        let bg = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]
+        let rotate = Math.random() * 360;
+        let confetti = $('<div class=confetti>')
+          .appendTo('#scene-main')
+          .css({
+            'width': width + 'px',
+            'height': height + 'px',
+            'top': '0',
+            'left': leftBefore + 'px',
+            'background-color': bg,
+            'opacity': 0.9,
+            'transform': "rotate("+ rotate + "deg)",
+          }).animate({
+            'top': topAfter + 'px',
+            'left': leftAfter + 'px',
+            'opacity': 0,
+          }, 2000, function () {
+            confetti.remove();
+          });
+      }, Math.random() * 500);
+    }
+  }
 
   // ################################
   // READY!!
