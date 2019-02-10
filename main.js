@@ -1,7 +1,7 @@
 $(function () {
   "use strict";
 
-  const DEBUG = true, DEBUG_FINAL = false;
+  const DEBUG = false, DEBUG_FINAL = false;
   const LEVEL_DATA = [
     {
       name: 1,
