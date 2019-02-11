@@ -24,7 +24,6 @@ html {
 
 body {
   background-color: black;
-  height: 100%;
 }
 
 .button {
@@ -45,6 +44,7 @@ body {
   width: 800px;
   height: 500px;
   overflow: hidden;
+  transform-origin: top left;
 }
 
 #scene-preload, #scene-main {
