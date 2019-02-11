@@ -98,10 +98,12 @@ $(function () {
         rowDiv = $('<div class=card-row>').appendTo('#pane-area');
         rowLimit += LEVEL_DATA[currentLevel].layout[rowId++];
       }
-      let cardDiv = $('<div class=card>').appendTo(rowDiv)
+      let cardFlipper = $('<div class=card-flipper>').appendTo(rowDiv)
         .data({index: k, name: cards[k]});
-      if (DEBUG) cardDiv.text(cards[k]);
-      toggleCard(cardDiv, false);
+      let cardFront = $('<div class="card card-front">').appendTo(cardFlipper);
+      let cardBack = $('<div class="card card-back">').appendTo(cardFlipper);
+      toggleCard(cardBack, false);
+      toggleCard(cardFront, cards[k]);
       // Update the count
       if (cards[k] != 'X') {
         pairsLeft += 0.5;
@@ -117,21 +119,26 @@ $(function () {
     $('#hud-lives').text(livesLeft);
   }
 
-  $('#pane-area').on("click", ".card", function (e) {
+  $('#pane-area').on("click", ".card-flipper", function (e) {
     if (livesLeft <= 0 || pairsLeft <= 0) return;
     let thisCard = $(this);
-    // Speed mode: interrupt the timeout
-    if (open1 !== null && open2 !== null) {
-      validatePairAfter();
-    }
-    // Don't open removed card
-    if (thisCard.hasClass('removed')) return;
-    // Don't open the same card
-    if (open1 !== null && open2 === null &&
-        open1.data('index') == thisCard.data('index')) {
+    console.log(thisCard.data('name'));
+    // Don't open removed or opened card
+    if (
+      thisCard.hasClass('removed') ||
+      (open1 !== null && open1.data('index') == thisCard.data('index')) ||
+      (open2 !== null && open2.data('index') == thisCard.data('index'))
+    ) {
       return;
     }
-    toggleCard(thisCard, true);
+    // Flip back the old cards if needed
+    if (open1 !== null && open2 !== null) {
+      if (!open1.hasClass('removed')) open1.removeClass('flip');
+      if (!open2.hasClass('removed')) open2.removeClass('flip');
+      open1 = null;
+      open2 = null;
+    }
+    thisCard.addClass('flip');
     // If it's X, reduce life and maybe show the game over screen
     if (thisCard.data('name') == 'X') {
       livesLeft--;

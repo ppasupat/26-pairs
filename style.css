@@ -82,6 +82,7 @@ button {
   position: absolute;
   right: 20px; top: 20px;
   width: 680px; height: 340px;
+  perspective: 1000px;
 }
 
 #pane-bag {
@@ -175,21 +176,36 @@ button {
   align-items: center;
 }
 
+.card-flipper {
+  width: 70px;
+  height: 90px;
+  margin: 3px;
+  transform-style: preserve-3d;
+  transition: transform 200ms;
+}
+.card-flipper.flip {
+  transform: rotateY(180deg);
+}
+.card-flipper.removed .card {
+  opacity: 0.2;
+}
+
 .card, .card-slot {
   border: 1px solid #200;
   border-radius: 5px;
   width: 70px;
   height: 90px;
-  margin: 3px;
+  background-color: #FFFFFFCC;
   background-image: url('img/cards.png');
   font-size: 40px;   /* for debug only */
 }
 
-.card.removed {
-  opacity: 0.2;
+.card-front, .card-back {
+  position: absolute;
+  backface-visibility: hidden;
 }
-#pane-bag .card {
-  background-color: white;
+.card-front {
+  transform: rotateY(180deg);
 }
 
 .card-slot {
