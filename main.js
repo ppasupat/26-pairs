@@ -425,8 +425,12 @@ $(function () {
     let ratio = Math.min(
       1.0,
       window.innerWidth / SCREEN_WIDTH,
-      window.innerHeight / SCREEN_HEIGHT,
+      (window.innerHeight - 25) / SCREEN_HEIGHT,
     );
+    $('#game-wrapper').css({
+      'width': (SCREEN_WIDTH * ratio) + 'px',
+      'height': (SCREEN_HEIGHT * ratio) + 'px',
+    });
     $('#game').css('transform', 'scale(' + ratio + ')');
   }
 
