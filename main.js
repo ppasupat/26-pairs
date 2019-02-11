@@ -67,7 +67,7 @@ $(function () {
     card.css('background-position-x', '' + offset + 'px');
   }
 
-  $('#pane-info button').click(function () {
+  $('#pane-info .button').click(function () {
     if (currentLevel < LEVEL_DATA.length) {
       genCards();
       livesLeft = LEVEL_DATA[currentLevel].lives;
@@ -197,12 +197,6 @@ $(function () {
 
   function showLose() {
     confetti(poopConfetti);
-    $('.card').each(function (i, card) {
-      card = $(card);
-      if (!card.hasClass('removed') && card.data('name') == 'X') {
-        toggleCard(card, true);
-      }
-    });
     setTimeout(function () {
       $('.info').hide();
       $('#info-lose').show();
@@ -302,12 +296,19 @@ $(function () {
       if (currentSlotMark !== slotDivs.length) {
         toggleCard(slotDivs[currentSlotMark], 'K');
       } else {
-        confetti(currentLevel == LEVEL_DATA.length ? normalConfetti : birdConfetti);
         if (currentLevel == LEVEL_DATA.length) {
+          confetti(normalConfetti);
           setTimeout(function () {
             currentLevel++;
             genExtra();
           }, EXTRA_TIMEOUT);
+        } else {
+          $('#item-bird').fadeIn(ITEM_FADE);
+          let loop = function () {
+            confetti(birdConfetti);
+            setTimeout(loop, CONFETTI_TIMEOUT * 1.2);
+          };
+          loop();
         }
       }
     }
@@ -355,13 +356,13 @@ $(function () {
     for (let i = 0; i < NUM_CONFETTI; i++) {
       let leftBefore = randRange(25, SCREEN_WIDTH - 50);
       let leftAfter = leftBefore + randRange(-200, 200);
-      leftAfter = Math.min(SCREEN_WIDTH - 50, Math.max(25, leftAfter));
-      let topAfter = randRange(0.5, 0.9) * SCREEN_HEIGHT;
+      leftAfter = Math.max(25, Math.min(SCREEN_WIDTH - 50, leftAfter));
+      let topAfter = randRange(0.5, 1.0) * SCREEN_HEIGHT;
       let rotateBefore = Math.random();
       let rotateAfter = Math.random();
-      let confetti = objFn().appendTo('#scene-main');
+      let confetti = objFn().appendTo('#game');
       confetti.css({
-        'top': '0',
+        'top': '-20px',
         'left': leftBefore + 'px',
         'opacity': 1.0,
         'transform': 'rotate(' + rotateBefore + 'turn)',
@@ -400,7 +401,7 @@ $(function () {
   }
 
   function poopConfetti() {
-    let size = Math.random() * 32 + 10;
+    let size = Math.random() * 60 + 10;
     return $('<div class="confetti confetti-poop">').css({
       'width': size + 'px',
       'height': size + 'px',
@@ -409,7 +410,7 @@ $(function () {
   }
 
   function birdConfetti() {
-    let size = Math.random() * 32 + 10;
+    let size = Math.random() * 60 + 10;
     return $('<div class="confetti confetti-bird">').css({
       'width': size + 'px',
       'height': size + 'px',
@@ -450,7 +451,7 @@ $(function () {
     if (numResourcesLeft == 0) {
       $('#pane-loading')
         .empty()
-        .append($('<button>').text('เริ่มเล่น!').click(function () {
+        .append($('<div class=button>').text('เริ่มเล่น!').click(function () {
           $('#scene-main').show();
           $('#pane-info, #info-inst').show();
           $('#scene-preload').hide();
