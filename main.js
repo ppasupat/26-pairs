@@ -336,45 +336,53 @@ $(function () {
   // Stole the idea from Chuck Grimmett's post here:
   // http://www.cagrimmett.com/til/2018/01/05/css-confetti.html
 
-  const NUM_CONFETTI = 80;
+  const NUM_CONFETTI = 50,
+    CONFETTI_TIMEOUT = 2000;
+
+  function randRange(a, b) {
+    return (Math.random() * (b - a)) + a;
+  }
 
   function confetti(objFn) {
+    let confettis = [], afters = [];
     for (let i = 0; i < NUM_CONFETTI; i++) {
-      setTimeout(function () {
-        let leftBefore = Math.random() * (SCREEN_WIDTH - 75) + 25;
-        let leftAfter = leftBefore + Math.random() * 400 - 200;
-        leftAfter = Math.min(SCREEN_WIDTH - 50, Math.max(25, leftAfter));
-        let topAfter = (Math.random() * 0.3 + 0.7) * SCREEN_HEIGHT;
-        let rotateAfter = Math.random() * 360;
-        let confetti = objFn()
-          .appendTo('#scene-main')
-          .css({
-            'top': '0',
-            'left': leftBefore + 'px',
-            'opacity': 0.9,
-          }).animate({
-            'top': topAfter + 'px',
-            'left': leftAfter + 'px',
-            'opacity': 0,
-            'rotate': rotateAfter,
-          }, {
-            duration: 2000,
-            step: function (now, fx) {
-              if (fx.prop === 'rotate')
-                $(this).css({'transform' : 'rotate(' + now + 'deg)'});
-            },
-            complete: function () {
-              confetti.remove();
-            },
-          });
-      }, Math.random() * 500);
+      let leftBefore = randRange(25, SCREEN_WIDTH - 50);
+      let leftAfter = leftBefore + randRange(-200, 200);
+      leftAfter = Math.min(SCREEN_WIDTH - 50, Math.max(25, leftAfter));
+      let topAfter = randRange(0.5, 0.9) * SCREEN_HEIGHT;
+      let rotateBefore = Math.random();
+      let rotateAfter = Math.random();
+      let confetti = objFn().appendTo('#scene-main');
+      confetti.css({
+        'top': '0',
+        'left': leftBefore + 'px',
+        'opacity': 1.0,
+        'transform': 'rotate(' + rotateBefore + 'turn)',
+        'transition': 'top 2s, left 2s, opacity 2s, transform 2s',
+        'display': 'none',
+      });
+      confettis.push(confetti);
+      afters.push({
+        'top': topAfter + 'px',
+        'left': leftAfter + 'px',
+        'opacity': 0.2,
+        'transform': 'rotate(' + rotateAfter + 'turn)',
+      });
     }
+    setTimeout(function () {
+      for (let i = 0; i < NUM_CONFETTI; i++) {
+        confettis[i].show().css(afters[i]);
+      }
+    }, 10);
+    setTimeout(function () {
+      $('.confetti').remove();
+    }, CONFETTI_TIMEOUT);
   }
 
   const CONFETTI_COLORS = ['red', 'green', 'yellow', 'blue'];
 
   function normalConfetti() {
-    let width = Math.random() * 5 + 1;
+    let width = Math.random() * 8 + 1;
     let height = width * 1.6;
     let bg = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]
     return $('<div class=confetti>').css({
