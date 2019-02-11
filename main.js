@@ -38,7 +38,7 @@ $(function () {
     ["T", "O", " ", "O", "I", "L"],
   ];
   const EXTRA_ANSWER = ["B", "L", "R", "D"];
-  const CARD_WIDTH = 60, CARD_HEIGHT = 80;
+  const CARD_WIDTH = 70, CARD_HEIGHT = 90;
   const SCREEN_WIDTH = 800, SCREEN_HEIGHT = 500;
   const TIMEOUT = 1000,
     INFO_FADE = 300,
@@ -405,35 +405,53 @@ $(function () {
   // ################################
   // READY!!
 
-  function preload() {
-    // TODO
-    $('#pane-loading')
-      .empty()
-      .append($('<button>').text('เริ่มเล่น!').click(function () {
-        $('#scene-main').show();
-        $('#pane-info, #info-inst').show();
-        $('#scene-preload').hide();
-        initBag();
-      }));
-  }
-
-  // Handle screen resizing to 800 x 500
-  // https://stackoverflow.com/q/8735457
   function resizeScreen() {
-    let sW = Math.min(window.screen.width, $(window).width());
-    let sH = Math.min(window.screen.height, $(window).height()) - 25;
-    let ratio = Math.min(sW / 800, sH / 500);
-    $('#viewport').attr('content',
-      'width='
-      + (ratio >= 1 ? 'device-width' : (ratio * 800))
-      + ', initial-scale='
-      + (ratio >= 1 ? 1.0 : ratio)
-      + ', user-scalable=no');
-    window.scroll(0, 1);
+    let ratio = Math.min(
+      1.0,
+      window.innerWidth / SCREEN_WIDTH,
+      window.innerHeight / SCREEN_HEIGHT,
+    );
+    $('#game').css('transform', 'scale(' + ratio + ')');
   }
 
   resizeScreen();
   $(window).resize(resizeScreen);
-  preload();
+
+  const imageList = [
+    "img/cards.png",
+    "img/bg.png",
+    "img/balloons.png",
+    "img/flags.png",
+    "img/cake.png",
+    "img/present.png",
+    "img/poop.png",
+    "img/bird.png",
+  ];
+  let numResourcesLeft = imageList.length;
+  $('#pane-loading').text('Loading resources (' + numResourcesLeft + ' left)');
+
+  function decrementPreload () {
+    numResourcesLeft--;
+    if (numResourcesLeft == 0) {
+      $('#pane-loading')
+        .empty()
+        .append($('<button>').text('เริ่มเล่น!').click(function () {
+          $('#scene-main').show();
+          $('#pane-info, #info-inst').show();
+          $('#scene-preload').hide();
+          initBag();
+        }));
+    } else {
+      $('#pane-loading').text('Loading resources (' + numResourcesLeft + ' left)');
+    }
+  }
+
+  let images = [];
+  imageList.forEach(function (x) {
+    let img = new Image();
+    img.onload = decrementPreload;
+    img.src = x;
+    images.push(img);
+  });
 
 });
