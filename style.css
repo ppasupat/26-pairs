@@ -132,7 +132,6 @@ body {
   width: 121px; height: 99px;
   background: url('img/present.png');
   display: none;
-  z-index: 100;
 }
 
 #item-cake {
