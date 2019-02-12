@@ -144,6 +144,7 @@ $(function () {
       livesLeft--;
       updateHud();
       flashHud('#hud-lives');
+      flashBackground();
       if (livesLeft === 0) {
         showLose();
         return;
@@ -281,6 +282,7 @@ $(function () {
     });
     toggleCard(slotDivs[0], 'K');
     slotReady = false;
+    $('#item-present').css('z-index', 100);
     $('#pane-extra').fadeIn(SLOT_FADE, function () {slotReady = true;});
   }
 
@@ -340,6 +342,14 @@ $(function () {
       });
     }, FLASH_TIMEOUT));
   };
+
+  function flashBackground() {
+    let div = $('#pane-flash');
+    if (div.data('flash')) clearTimeout(+div.data('flash'));
+    div.show().data('flash', setTimeout(function () {
+      div.hide();
+    }, FLASH_TIMEOUT));
+  }
 
   // Stole the idea from Chuck Grimmett's post here:
   // http://www.cagrimmett.com/til/2018/01/05/css-confetti.html

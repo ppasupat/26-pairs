@@ -81,6 +81,13 @@ body {
   overflow: hidden;
 }
 
+#pane-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #66000044;
+  display: none;
+}
+
 #pane-hud {
   position: absolute;
   left: 20px; top: 20px;
