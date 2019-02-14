@@ -267,6 +267,7 @@ $(function () {
     toggleCard(slotDivs[0], 'K');
     slotReady = false;
     $('#pane-final').fadeIn(SLOT_FADE, function () {slotReady = true;});
+    $('#pane-bag').addClass('final');
   }
 
   function genExtra() {

@@ -37,6 +37,7 @@ body {
   border: 2px solid #327;
   font-size: 30px;
   padding: 10px 20px;
+  cursor: pointer;
 }
 .button:active {
   background-color: #DCE;
@@ -206,9 +207,14 @@ body {
   margin: 3px;
   transform-style: preserve-3d;
   transition: transform 200ms;
+  cursor: pointer;
 }
 .card-flipper.flip {
   transform: rotateY(180deg);
+  cursor: default;
+}
+.card-flipper.removed {
+  cursor: default;
 }
 .card-flipper.removed .card {
   opacity: 0.2;
@@ -269,6 +275,10 @@ body {
 .bag-group {
   margin: 0.5px;
   width: 70px;
+}
+
+#pane-bag.final .bag-group .card {
+  cursor: pointer;
 }
 
 .bag-group .card {
